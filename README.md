@@ -25,7 +25,8 @@ Presently, the protocol is (from a description in source file):
         op-code) is sent back as an Object, treated as a String object
         by the client application.
 
-    5. The client application shows the transmitted program output to
-       the user.
+
+ note: the client application should show the transmitted program output to
+ the user neatly.
 
 
