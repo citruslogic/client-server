@@ -6,7 +6,8 @@ receives a String object. Then, the client application prints the String object
 contents to the terminal window.
 
 
-To run, do:
+To run, do
+	:
 	java ClientController your-host-here
 	
 The application requires one argument, the hostname. Otherwise, it will fail to run.
