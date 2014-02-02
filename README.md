@@ -7,9 +7,9 @@ contents to the terminal window.
 
 
 To run, do
-	:
+	```
 	java ClientController your-host-here
-	
+	```
 The application requires one argument, the hostname. Otherwise, it will fail to run.
 
 
