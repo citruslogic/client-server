@@ -1,5 +1,10 @@
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.text.DateFormat;
+
 
 
 /* ClientController is just a basic client application for a server.
@@ -30,7 +35,7 @@ class ClientController {
 
 
 
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) throws InterruptedException, IOException {
 
         byte moption;
         short nclients;
@@ -54,7 +59,7 @@ class ClientController {
 
         Scanner kb = new Scanner(System.in);
 
-			while (true) {
+                while (true) {
 
 
 				
@@ -134,17 +139,28 @@ class ClientController {
 
                 }
 
-                /* TODO: computeMeanTime() needs to be called.
+                /*
                  *
                  * Store millisec for threads in file or keep internal? */
 
+
+                DateFormat dateFormat = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+                Calendar cal = Calendar.getInstance();
+
+                PrintWriter benchmark = new PrintWriter(new BufferedWriter(new FileWriter("benchmark.txt", true)));
+                benchmark.println(dateFormat.format(cal.getTime()) + "[" + nclients + "]"
+                         + "\tThread time (ms): "
+                         + "\t"
+                         + computeMeanTime(theClientSpawners, nclients)
+                         + "\n\n");
+
+                benchmark.close();
 
             } // end while
 
     } // end main
 
     public static long computeMeanTime(ClientSpawner[] theClientSpawners, short nclients) {
-
 
         long averageElapsedTime = 0;
 
@@ -153,7 +169,10 @@ class ClientController {
 
         return averageElapsedTime / nclients;
 
-    }
+        }   // end computeMeanTime
+
+
+
 }
 
 
