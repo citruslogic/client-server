@@ -8,16 +8,16 @@ contents to the terminal window.
 
 To run, do
 
-	```
+	
 	java ClientController your-host-here
-	```
+	
 
 The application requires one argument, the hostname. Otherwise, it will fail to run.
 
 
 
 
-The application is very simple. The workhorse is the ClientSpawner class which 
+The workhorse is the ClientSpawner class which 
 is driven by its ClientController class. 
 
 
