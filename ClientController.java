@@ -64,18 +64,15 @@ class ClientController {
 
 				
 				System.out.println("Enter your selection. \n"
-                    + "=============================\n"
-				    + "1. Host Current Date and Time\n"
-				    + "2. Host uptime\n"
-                    + "3. Host memory use\n"
-                    + "4. Host Netstat\n"
-                    + "5. Host current users\n"
-                    + "6. Host running processes\n"
-				    + "7. Quit\n"
-				    + "\n");
-
-
-
+                        + "=============================\n"
+                        + "1. Host Current Date and Time\n"
+                        + "2. Host uptime\n"
+                        + "3. Host memory use\n"
+                        + "4. Host Netstat\n"
+                        + "5. Host current users\n"
+                        + "6. Host running processes\n"
+                        + "7. Quit\n"
+                        + "\n");
 
                 // grab the first byte for the menu option.
                 try {
@@ -142,19 +139,9 @@ class ClientController {
                 /*
                  *
                  * Store millisec for threads in file or keep internal? */
+                writeBenchmarkFile(theClientSpawners, nclients);
 
 
-                DateFormat dateFormat = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
-                Calendar cal = Calendar.getInstance();
-
-                PrintWriter benchmark = new PrintWriter(new BufferedWriter(new FileWriter("benchmark.txt", true)));
-                benchmark.println(dateFormat.format(cal.getTime()) + "[" + nclients + "]"
-                         + "\tThread time (ms): "
-                         + "\t"
-                         + computeMeanTime(theClientSpawners, nclients)
-                         + "\n\n");
-
-                benchmark.close();
 
             } // end while
 
@@ -172,7 +159,24 @@ class ClientController {
         }   // end computeMeanTime
 
 
+    public static void writeBenchmarkFile(ClientSpawner[] cs, short nc) throws IOException {
+        /* writes to a text file the time in ms. in other words, the time elapsed for the
+           threads in ClientSpawners to complete their tasks.
+         */
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+        Calendar cal = Calendar.getInstance();
 
-}
+        PrintWriter benchmark = new PrintWriter(new BufferedWriter(new FileWriter("benchmark.txt", true)));
+        benchmark.println(dateFormat.format(cal.getTime()) + "[" + nc + "]"
+                + "\tThread time (ms): "
+                + "\t"
+                + computeMeanTime(cs, nc)
+                + "\n\n");
+
+        benchmark.close();
+
+    } // end writeBenchmarkFile
+
+} // end ClientController class
 
 
