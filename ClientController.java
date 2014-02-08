@@ -1,34 +1,35 @@
+/**
+ * Created with IntelliJ IDEA.
+ * User: Frank Butler
+ * Date: 2/1/14
+ * Time: 2:58 PM
+ *
+ *  ClientController is just a basic client application for a server.
+ *  The server is to run as many as 6 different utility programs and
+ *  to deliver their outputs to their clients.
+ *
+ *  The protocol is very simple. ClientSpawner is used here to make as
+ *   many clients as desired.
+ *
+ *   1. Each client thread will send a string to
+ *   the server.
+ *
+ *   2. The server receives the string formatted UTF16-BE.
+ *
+ *   3. The server should run this string as-is.
+ *
+ *   4. Its output from the program is sent to the client as a UTF16-BE
+ *   string.
+ *
+ *   5. The client application shows the transmitted program output to
+ *      the user.
+ */
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.text.DateFormat;
-
-
-
-/* ClientController is just a basic client application for a server.
-   The server is to run as many as 6 different utility programs and
-   to deliver their outputs to their clients.
-
-   The protocol is very simple. ClientSpawner is used here to make as
-    many clients as desired.
-
-    1. Each client thread will send a byte to
-    the server.
-
-    2. The server receives the byte, treated as an operation code.
-
-    3. The server should interpret this operation code as a command to be
-       executed on its system.
-
-    4. Its output from the program (that is to be run according to the
-        op-code) is sent back as an Object, treated as a String object
-        by the client application.
-
-    5. The client application shows the transmitted program output to
-       the user.
-  */
 
 class ClientController {
 
@@ -37,17 +38,16 @@ class ClientController {
 
 	public static void main(String[] args) throws InterruptedException, IOException {
 
-        byte moption;
-        short nclients;
+        byte moption;           // menu option
+        short nclients;         // number of clients
+        String cmdString;       // the command string to send to the server
+        String server;          // the server address
 
 
 
-        String server;
-
-        // try to get the server address from the command line.
         if (args.length < 1) {
 
-            System.err.println("No server address given as argument. Quitting..");
+            System.err.println("fatal: no server address given as argument. Quitting..");
             System.exit(1);
         }
 
@@ -117,14 +117,16 @@ class ClientController {
                      continue;
                  }
 
+                cmdString = makeCommand(moption);   // make the complete command string to send to the server later.
+
                 // store the clients in an array.
                 ClientSpawner[] theClientSpawners = new ClientSpawner[nclients];
 
 
 
-                // fill the array with spawners.
+                // fill the array with spawners. remember to send the complete string, with arguments.
                 for (int i = 0; i < nclients; i++)
-                    theClientSpawners[i] = new ClientSpawner(moption, server);
+                    theClientSpawners[i] = new ClientSpawner(cmdString, server);
 
                 // wait for all of the threads to finish before returning to the menu.
                 System.out.println("Connections are setting up...");
@@ -144,6 +146,7 @@ class ClientController {
 
 
             } // end while
+
 
     } // end main
 
@@ -176,6 +179,49 @@ class ClientController {
         benchmark.close();
 
     } // end writeBenchmarkFile
+
+    static String makeCommand(byte stcmd) throws IOException {
+
+        String cmdname, args;
+
+
+        switch (stcmd) {
+
+            case 6:
+                cmdname = "ps";
+                break;
+            case 5:
+                cmdname = "who";
+                break;
+            case 4:
+                cmdname = "netstat";
+                break;
+            case 3:
+                cmdname = "free";
+                break;
+            case 2:
+                cmdname = "uptime";
+                break;
+            case 1:
+                cmdname = "date";
+                break;
+            default:
+                throw new IllegalArgumentException("Not an accepted command.");
+
+
+        }  // end switch on command
+
+        System.out.println("Add any extra arguments for " + cmdname + ": ");
+
+        Scanner getArgs = new Scanner(System.in);
+
+        // get the list of arguments from the user.
+        args = getArgs.nextLine();
+
+
+        return stcmd + " " + args;
+    } // end makeCommand
+
 
 } // end ClientController class
 

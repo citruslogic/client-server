@@ -1,6 +1,6 @@
 /**
  * Created with IntelliJ IDEA.
- * User: Frank
+ * User: Frank Butler
  * Date: 2/1/14
  * Time: 2:58 PM
  *
@@ -8,17 +8,19 @@
  * For the purpose of stress testing.
  *
  * Default operation: ClientSpawner creates 1 client connection to a server.
+ *
+ * The thread also keeps track of its own time for the comparison paper.
  */
 
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.DataInputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class ClientSpawner implements Runnable {
 
-    final private int opcode;                  // operation code for processing server-side command.
+    private String cmdString;                  // string for the server to use as command + args
     final private String server;               // the host we connect to.
     public final Thread clientThread;
 
@@ -26,10 +28,10 @@ public class ClientSpawner implements Runnable {
 
 
     // constructor for ClientSpawner class.
-    public ClientSpawner (short menuopt, String servername) {
+    public ClientSpawner (String cmd, String servername) {
 
-      this.server = servername;
-      this.opcode = menuopt;
+        this.server = servername;
+        this.cmdString = cmd;
 
         clientThread = new Thread(this);
         clientThread.start();
@@ -41,54 +43,53 @@ public class ClientSpawner implements Runnable {
     // run a new thread as many times as needed.
     public void run() {
 
-        try {
+        try (Socket socket = new Socket(server, 15000)) {
 
-            Socket socket = new Socket(server, 5200);
 
-            ObjectInputStream inputFromServer = new ObjectInputStream(socket.getInputStream());     // inbound.
+
+            // Data*Stream objects expect UTF-16BE
+            DataInputStream inputFromServer = new DataInputStream(socket.getInputStream());     // inbound.
 
             DataOutputStream outputFromClient = new DataOutputStream(socket.getOutputStream()); // outbound.
 
             long startTime = System.currentTimeMillis();
 
-            outputFromClient.writeByte(opcode);
-            /*
-             send out the operation code (opcode field) to the server. the server interprets the opcode
-             to run the server-side command, and the output on the server side is sent back as an Object.
 
-             the Object must be Serializable for this to work. this, in conjunction with StringBuilder on the
-             server side, should give the client some sensible program output.
+
+            /* we're not using bytes as operation codes anymore. instead, i'm sending a string to the
+               server.
 
               */
 
-             String programOutput = (String) inputFromServer.readObject(); // receive the program output as an object.
-                                                                           // and cast as String.
+            System.out.println("Sending command to be executed on host...");
+            sendString(outputFromClient, cmdString);
 
+
+            String programOutput = readString(inputFromServer); // receive the program output from server.
+            System.out.println("Finished receiving program output.");
+
+            System.out.println();
+            printProgramOutput(programOutput);  // print the program output we received from server
+                                                // to the user's screen.
 
             long stopTime = System.currentTimeMillis();
 
             elapsedTime = stopTime - startTime;
 
-            System.out.println(programOutput);
 
 
             socket.close();
 
-            System.out.println("Host finished procedure.");
+            System.out.println("Host finished task.");
 
         } catch (UnknownHostException e) {
-            System.err.println("Unknown host name or unresolved host.");
+            System.err.println("Unknown host name or unresolved host: " + server);
 
         } catch (IOException e) {
 
             System.err.println("Bad IO or host cannot be reached. Check the hostname and try again.");
             System.exit(1);
 
-        }  catch (ClassNotFoundException e) {
-
-            System.err.println("Java class for receiving program output not found on this computer.");
-            e.printStackTrace();
-            System.exit(2);
         }
 
 
@@ -102,5 +103,33 @@ public class ClientSpawner implements Runnable {
     }
 
 
+    String readString(DataInputStream in) throws IOException {
+
+        int length = in.readInt();
+
+        byte[] bytes = new byte[length];
+
+        in.readFully(bytes);
+
+        // return a string with encoding for Big Endian, which DIS uses.
+        return new String(bytes, "UTF-16BE");
+    }   // end readString
+
+
+    void sendString(DataOutputStream out, String st) throws IOException {
+
+        // if the string length is more than half the value of the largest
+        // integer, it is not a good string. toss it out.
+        if (st.length() > Integer.MAX_VALUE / 2)
+            throw new IllegalArgumentException("String is too long!");
+
+        out.writeInt(st.length() * 2);
+        out.writeChars(st);
+    }  // end sendString
+
+    void printProgramOutput(String st) {
+
+        System.out.println(st);
+    }  // end printProgramOutput
 
 }
