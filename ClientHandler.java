@@ -1,6 +1,4 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
 public class ClientHandler implements Runnable {
@@ -34,10 +32,10 @@ public class ClientHandler implements Runnable {
                     System.out.println();
 
 
-                    // just send it back. we don't care to execute this command for the time being.
-                    writeString(outputFromServer, inputChars);
+                    // send back the command output.
+                    writeString(outputFromServer, getProcessOutput(inputChars));
 
-                    socket.close();
+
                 }  // end service to clients
             }
         } catch (IOException e) {
@@ -49,8 +47,14 @@ public class ClientHandler implements Runnable {
     }  // end thread
 
 
-
-
+    /**
+     *  Read the byte length of the string first and then read in the bytes.
+     *  Completes with bounds checking.
+     *
+     * @param inputStream
+     * @return
+     * @throws IOException
+     */
     private String readChars(DataInputStream inputStream) throws IOException {
 
         int length = inputStream.readInt();
@@ -64,7 +68,13 @@ public class ClientHandler implements Runnable {
 
     }   // end readString
 
-
+    /**
+     *  Write the string's length as an integer to the outbound socket.
+     *
+     * @param outputStream
+     * @param string
+     * @throws IOException
+     */
     private void writeString(DataOutputStream outputStream, String string) throws IOException {
 
         if (string.length() > Integer.MAX_VALUE / 2)
@@ -74,5 +84,33 @@ public class ClientHandler implements Runnable {
         outputStream.writeChars(string);
 
     } // end writeString
+
+
+    /** Execute the command given by the string sent to the server.
+     * and return the command output to the calling method.
+     *
+     * @param inString
+     * @return
+     * @throws IOException
+     */
+    private String getProcessOutput(String inString) throws IOException {
+
+        ProcessBuilder processBuilder = new ProcessBuilder(inString);
+        Process pr = processBuilder.start();
+
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+        StringBuilder commandOutput = new StringBuilder();
+
+        String line;
+
+        // turn the command output into a string to be sent back to the client.
+        while ((line = bufferedReader.readLine()) != null) {
+            commandOutput.append(line);
+            commandOutput.append(System.getProperty("line.separator"));
+
+        } // end while for bufferedReader
+
+        return commandOutput.toString();
+    }
 
 }   // end class ClientHandler
