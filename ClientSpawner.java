@@ -78,8 +78,6 @@ public class ClientSpawner implements Runnable {
 
 
 
-            socket.close();
-
             System.out.println("Host finished task.");
 
         } catch (UnknownHostException e) {
@@ -124,7 +122,9 @@ public class ClientSpawner implements Runnable {
             throw new IllegalArgumentException("String is too long!");
 
         out.writeInt(st.length() * 2);
+        System.out.println("client wrote length: " + st.length() * 2);
         out.writeChars(st);
+        out.flush();
     }  // end sendString
 
     void printProgramOutput(String st) {

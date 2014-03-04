@@ -18,8 +18,11 @@ public class ClientHandler implements Runnable {
 
          // duplicate the client's input and output streams
         try {
-            try (DataInputStream inputFromClient = new DataInputStream(socket.getInputStream())) {
-                DataOutputStream outputFromServer = new DataOutputStream(socket.getOutputStream());
+            try (
+                    DataInputStream inputFromClient = new DataInputStream(socket.getInputStream());
+                    DataOutputStream outputFromServer = new DataOutputStream(socket.getOutputStream())
+                    ) {
+
 
                 // service clients
                 while (true) {
@@ -39,7 +42,7 @@ public class ClientHandler implements Runnable {
                 }  // end service to clients
             }
         } catch (IOException e) {
-            System.err.println(e);
+            e.printStackTrace();
 
         } // end try-with-resources
 
@@ -58,7 +61,7 @@ public class ClientHandler implements Runnable {
     private String readChars(DataInputStream inputStream) throws IOException {
 
         int length = inputStream.readInt();
-
+        System.out.println("readInt has: " + length);
         byte[] bytes = new byte[length];
 
         inputStream.readFully(bytes);
@@ -82,7 +85,7 @@ public class ClientHandler implements Runnable {
 
         outputStream.writeInt(string.length() * 2);
         outputStream.writeChars(string);
-
+        outputStream.flush();
     } // end writeString
 
 
@@ -127,6 +130,7 @@ public class ClientHandler implements Runnable {
         }
 
         // turn the command output into a string to be sent back to the client.
+        reader.close();
         return commandOutput.toString();
     }  // end getProcessOutput
 
