@@ -95,7 +95,7 @@ public class ClientHandler implements Runnable {
      */
     private String getProcessOutput(String inString) throws IOException {
 
-        ProcessBuilder processBuilder = new ProcessBuilder(inString);
+        ProcessBuilder processBuilder = new ProcessBuilder(inString.split("\\s+"));
         Process pr = processBuilder.start();
 
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
