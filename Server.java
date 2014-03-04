@@ -9,9 +9,11 @@ public class Server {
 
    public static void main(String[] args) throws IOException {
 
-    try (ServerSocket server = new ServerSocket(15000)) {
+       int clientNo = 1;
 
-        int clientNo = 1;
+       try (ServerSocket server = new ServerSocket(15000)) {
+
+
 
         System.out.println("Starting server: listening on non-privileged port 15000");
         System.out.println();

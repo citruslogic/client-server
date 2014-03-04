@@ -95,22 +95,39 @@ public class ClientHandler implements Runnable {
      */
     private String getProcessOutput(String inString) throws IOException {
 
+
+        char[] chars = new char[32768];
+
+        // ProcessBuilder needs an array like "ls", "-al", etc..
         ProcessBuilder processBuilder = new ProcessBuilder(inString.split("\\s+"));
         Process pr = processBuilder.start();
 
-        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-        StringBuilder commandOutput = new StringBuilder();
 
-        String line;
+        StringBuilder commandOutput = new StringBuilder();
+        Reader reader = new InputStreamReader(pr.getInputStream());
+
+
+        while (true) {
+
+            int length;
+            try {
+
+                length = reader.read(chars);
+
+                if (length == -1)
+                    break;
+
+            } catch (EOFException e) {
+                break;
+            }
+
+
+            commandOutput.append(chars, 0, length);
+
+        }
 
         // turn the command output into a string to be sent back to the client.
-        while ((line = bufferedReader.readLine()) != null) {
-            commandOutput.append(line);
-            commandOutput.append(System.getProperty("line.separator"));
-
-        } // end while for bufferedReader
-
         return commandOutput.toString();
-    }
+    }  // end getProcessOutput
 
 }   // end class ClientHandler

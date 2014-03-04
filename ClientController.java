@@ -88,7 +88,7 @@ class ClientController {
                     }
 
                     // menu options that are out of bounds.
-                    if (moption > 7 || moption < 1) {
+                    if (moption > 8 || moption < 1) {
                         System.out.println("\nMenu option is out of bounds. Try again with" +
                                 " any menu option, 1 through 7.\n");
                         continue;
@@ -166,7 +166,7 @@ class ClientController {
         /* writes to a text file the time in ms. in other words, the time elapsed for the
            threads in ClientSpawners to complete their tasks.
          */
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/YYYY HH:mm:ss");
+        DateFormat dateFormat = new SimpleDateFormat("MM/dd/YYYY HH:mm:ss");
         Calendar cal = Calendar.getInstance();
 
         PrintWriter benchmark = new PrintWriter(new BufferedWriter(new FileWriter("benchmark.txt", true)));
@@ -187,6 +187,9 @@ class ClientController {
 
         switch (stcmd) {
 
+            case 8:
+                cmdname = "cmd /c dir";
+                break;
             case 6:
                 cmdname = "ps";
                 break;
@@ -219,7 +222,7 @@ class ClientController {
         args = getArgs.nextLine();
 
 
-        return stcmd + " " + args;
+        return cmdname + " " + args;
     } // end makeCommand
 
 

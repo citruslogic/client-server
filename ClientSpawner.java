@@ -87,7 +87,7 @@ public class ClientSpawner implements Runnable {
 
         } catch (IOException e) {
 
-            System.err.println("Bad IO or host cannot be reached. Check the hostname and try again.");
+            e.printStackTrace();
             System.exit(1);
 
         }
