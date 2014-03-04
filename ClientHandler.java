@@ -27,24 +27,29 @@ public class ClientHandler implements Runnable {
                 // service clients
                 while (true) {
 
-                    String inputChars = readChars(inputFromClient);
+                    try {
+                        String inputChars = readChars(inputFromClient);
 
 
-                    System.out.println("The string sent to me was " + inputChars + " from "
+                        System.out.println("The string sent to me was " + inputChars + " from "
                             + "client " + clientNo);
-                    System.out.println();
+                        System.out.println();
 
 
-                    // send back the command output.
-                    writeString(outputFromServer, getProcessOutput(inputChars));
+                        // send back the command output.
+                        writeString(outputFromServer, getProcessOutput(inputChars));
 
+                    } catch (EOFException e) {
+                        // client closed connection. nothing to do.
+                        break;
+                    }
 
                 }  // end service to clients
             }
         } catch (IOException e) {
             e.printStackTrace();
 
-        } // end try-with-resources
+        }  // end try-with-resources
 
 
     }  // end thread

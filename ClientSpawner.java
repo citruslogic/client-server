@@ -43,17 +43,17 @@ public class ClientSpawner implements Runnable {
     // run a new thread as many times as needed.
     public void run() {
 
-        try (Socket socket = new Socket(server, 15000)) {
+        try (Socket socket = new Socket(server, 15000);
+             DataInputStream inputFromServer = new DataInputStream(socket.getInputStream());
+             DataOutputStream outputFromClient = new DataOutputStream(socket.getOutputStream())
+            ) {
+            /*
+            inputFromServer is our data coming in.
+            outputFromClient is our data going out.
 
-
-
-            // Data*Stream objects expect UTF-16BE
-            DataInputStream inputFromServer = new DataInputStream(socket.getInputStream());     // inbound.
-
-            DataOutputStream outputFromClient = new DataOutputStream(socket.getOutputStream()); // outbound.
+            */
 
             long startTime = System.currentTimeMillis();
-
 
 
             /* we're not using bytes as operation codes anymore. instead, i'm sending a string to the
